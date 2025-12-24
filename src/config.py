@@ -1,4 +1,4 @@
-import os
+﻿import os
 
 TARGET_IP = "2.6.1.3"
 TARGET_PORT = 4
