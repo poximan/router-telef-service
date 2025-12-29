@@ -50,18 +50,18 @@ class MqttPublisher:
                 time.sleep(backoff)
                 backoff = min(backoff * 2, 30)
 
-    def _on_connect(self, _client, _userdata, _flags, rc, _properties=None):
-        self._connected = (rc == 0)
+    def _on_connect(self, _client, _userdata, _flags, reason_code, _properties=None):
+        self._connected = (reason_code == mqtt.CONNACK_ACCEPTED)
         if self._connected:
-            logger.info("MQTT conectado (rc=%s)", rc)
+            logger.info("MQTT conectado (rc=%s)", reason_code)
             self._connected_event.set()
         else:
-            logger.error("MQTT no pudo conectar (rc=%s)", rc)
+            logger.error("MQTT no pudo conectar (rc=%s)", reason_code)
             self._connected_event.clear()
 
-    def _on_disconnect(self, _client, _userdata, rc, _properties=None):
+    def _on_disconnect(self, _client, _userdata, _disconnect_flags, reason_code, _properties=None):
         self._connected = False
-        logger.warning("MQTT desconectado (rc=%s)", rc)
+        logger.warning("MQTT desconectado (rc=%s)", reason_code)
         self._connected_event.clear()
         if not self._stopping:
             self._schedule_reconnect()
